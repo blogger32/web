@@ -1,0 +1,67 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="layout-container">
+    
+    <aside class="sidebar">
+        <div>
+            <a href="{% url 'dashboard' %}" class="logo">
+                <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"></path></svg>
+                <span class="gradient-text">Bookly</span>
+            </a>
+
+            <nav class="sidebar-nav">
+                <a href="{% url 'dashboard' %}" 
+                   class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                   <span>🏠</span> Головна
+                </a>
+                
+                <a href="#" class="sidebar-link"> <span>📚</span> Мої Книги
+                </a>
+                
+                <a href="#" class="sidebar-link"> <span>❤️</span> Улюблене
+                </a>
+                
+                <a href="{% url 'catalog' %}" 
+                   class="sidebar-link {% if request.resolver_match.url_name == 'catalog' %}active{% endif %}">
+                   <span>🧭</span> Каталог
+                </a>
+
+                {% if user.is_author %}
+                <a href="#" class="sidebar-link"> <span>✍️</span> Кабінет Автора
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+        
+        <div class="sidebar-profile">
+            <img src="{% static 'main/imgs/avatar_placeholder.png' %}" alt="Avatar" class="avatar-small">
+            <div class="user-info">
+                <span class="user-name">{{ user.first_name|default:user.email }}</span>
+                <a href="{% url 'logout' %}" class="logout-link">Вийти</a>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        
+        <header class="header">
+            <form action="{% url 'catalog' %}" method="GET" class="search-form">
+                <input type="text" name="search" class="search-input" placeholder="Пошук книг, авторів...">
+                <button type="submit" class="search-btn">🔍</button>
+            </form>
+            
+            <div class="header-actions">
+                <a href="#" class="header-icon">🔔</a> <a href="#" class="header-profile"> <img src="{% static 'main/imgs/avatar_placeholder.png' %}" alt="Avatar" class="avatar-medium">
+                </a>
+            </div>
+        </header>
+
+        <main class="page-content">
+            {% block main_content %}
+            {% endblock %}
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Реєстрація - Bookly{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-box">
+        <a href="{% url 'landing_page' %}" class="logo">
+            <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"></path></svg>
+            <span class="gradient-text">Bookly</span>
+        </a>
+
+        <h2 class="auth-title">Створити новий акаунт</h2>
+        
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message {{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="POST" action="{% url 'register' %}" class="auth-form">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="name">Ваше ім'я</label>
+                <input type="text" name="name" id="name" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Електронна пошта</label>
+                <input type="email" name="email" id="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <input type="password" name="password" id="password" required>
+            </div>
+            
+            <button type="submit" class="btn-primary auth-btn">Створити акаунт</button>
+        </form>
+        
+        <p class="auth-switch">
+            Вже маєте акаунт? <a href="{% url 'login' %}">Увійти</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

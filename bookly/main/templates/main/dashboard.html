@@ -1,0 +1,42 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Дашборд - Bookly{% endblock %}
+
+{% block main_content %}
+<h1 class="page-title gradient-text">Головна</h1>
+
+{% if currently_reading %}
+<section class="carousel-section">
+    <h2 class="section-title">📚 Продовжити читати</h2>
+    <div class="book-carousel">
+        {% for rental in currently_reading %}
+            {% include "main/partials/book_card.html" with book=rental.book rental=rental %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="carousel-section">
+    <h2 class="section-title">✨ Рекомендовано для вас</h2>
+    <div class="book-carousel">
+        {% for book in recommended_books %}
+            {% include "main/partials/book_card.html" with book=book %}
+        {% endfor %}
+    </div>
+</section>
+
+{% for genre in genres %}
+<section class="carousel-section">
+    <h2 class="section-title">📗 {{ genre }}</h2>
+    <div class="book-carousel">
+        {% for book in recommended_books %}
+            {% if book.genre == genre %}
+                {% include "main/partials/book_card.html" with book=book %}
+            {% endif %}
+        {% endfor %}
+    </div>
+</section>
+{% endfor %}
+
+{% endblock %}

@@ -1,0 +1,41 @@
+{% load static %}
+{% load static %}
+
+{% if rental %}
+<a href="{% url 'reader' rental_id=rental.id %}" class="book-card">
+    <div class="book-cover-wrapper">
+        <img src="{% if book.cover_url %}{{ book.cover_url }}{% else %}{% static 'main/imgs/book_placeholder.png' %}{% endif %}"
+             alt="{{ book.title }}" class="book-cover">
+    </div>
+
+    <div class="book-card-content">
+        <h3 class="book-card-title">{{ book.title }}</h3>
+        <p class="book-card-author">{{ book.author_name }}</p>
+
+        {% if rental.progress %}
+        <div class="progress-bar">
+            {% widthratio rental.progress.current_page rental.progress.total_pages 100 as progress_percent %}
+            <div class="progress-fill" style="width: {{ progress_percent }}%;"></div>
+        </div>
+        <p class="progress-text">{{ progress_percent }}%</p>
+        {% else %}
+        <p class="book-card-price">{{ book.daily_price }} грн/день</p>
+        {% endif %}
+    </div>
+</a>
+
+{% else %}
+<a href="{% url 'book_details' book_id=book.id %}" class="book-card">
+    <div class="book-cover-wrapper">
+        <img src="{% if book.cover_url %}{{ book.cover_url }}{% else %}{% static 'main/imgs/book_placeholder.png' %}{% endif %}"
+             alt="{{ book.title }}" class="book-cover">
+    </div>
+
+    <div class="book-card-content">
+        <h3 class="book-card-title">{{ book.title }}</h3>
+        <p class="book-card-author">{{ book.author_name }}</p>
+
+        <p class="book-card-price">{{ book.daily_price }} грн/день</p>
+    </div>
+</a>
+{% endif %}

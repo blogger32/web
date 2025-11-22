@@ -1,0 +1,55 @@
+{% extends 'main/base.html' %}
+{% load static %}
+
+{% block title %}Bookly - Оренда книг онлайн{% endblock %}
+
+{% block content %}
+<div class="landing-page">
+    
+    <header class="landing-header">
+        <div class="logo">
+            <svg class="icon" viewBox="0 0 24 24"> <path fill="currentColor" d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"></path>
+            </svg>
+            <span class="gradient-text">Bookly</span>
+        </div>
+        <nav>
+            <a href="{% url 'login' %}" class="btn-login">Увійти</a>
+            <a href="{% url 'register' %}" class="btn-primary">Почати безкоштовно</a>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">
+                Ваша наступна книга <span class="gradient-text">вже чекає</span>
+            </h1>
+            <p class="hero-subtitle">
+                Орендуйте електронні книги на день або місяць. Читайте де завгодно і коли завгодно.
+            </p>
+            <a href="{% url 'register' %}" class="btn-primary btn-large">
+                Почати читати
+                <svg class="icon-arrow" viewBox="0 0 20 20"> <path fill="currentColor" d="M10 3a1 1 0 0 1 .707.293l5 5a1 1 0 0 1 0 1.414l-5 5a1 1 0 0 1-1.414-1.414L13.586 11H4a1 1 0 1 1 0-2h9.586L9.293 4.707A1 1 0 0 1 10 3z"></path>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <section class="features">
+        <h2 class="section-title">Чому Bookly?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>Великий вибір</h3>
+                <p>Тисячі книг різних жанрів – від класики до сучасних бестселерів.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Гнучкі ціни</h3>
+                <p>Орендуйте на день або місяць – обирайте зручний варіант.</p>
+            </div>
+            <div class="feature-card">
+                <h3>Для авторів</h3>
+                <p>Опублікуйте свої книги та заробляйте на оренді.</p>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
