@@ -41,6 +41,7 @@ class Book(models.Model):
     # але для простоти перенесення вашої логіки, залишимо URL або шлях
     pdf_path = models.CharField(max_length=1000)
 
+    text_content = models.TextField(blank=True, null=True, help_text="Текст книги для режиму читання")
     total_pages = models.IntegerField()
     daily_price = models.DecimalField(max_digits=6, decimal_places=2)
     monthly_price = models.DecimalField(max_digits=8, decimal_places=2)

@@ -1,0 +1,48 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Каталог - Bookly{% endblock %}
+
+{% block main_content %}
+<div class="catalog-page">
+    <div class="catalog-header">
+        <h1 class="page-title">Каталог книг</h1>
+
+        <div class="genre-filters">
+            <a href="{% url 'catalog' %}" class="genre-tag {% if not request.GET.genre %}active{% endif %}">Всі</a>
+            {% for genre in genres %}
+                <a href="{% url 'catalog' %}?genre={{ genre }}"
+                   class="genre-tag {% if request.GET.genre == genre %}active{% endif %}">
+                   {{ genre }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="books-grid">
+        {% if books %}
+            {% for book in books %}
+                {% include "main/partials/book_card.html" with book=book %}
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <p>На жаль, за вашим запитом нічого не знайдено 😔</p>
+                <a href="{% url 'catalog' %}" class="btn-primary">Скинути фільтри</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    /* Додаткові стилі для каталогу, можна винести в style.css */
+    .catalog-header { margin-bottom: 32px; }
+    .genre-filters { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+    .genre-tag {
+        padding: 8px 16px; border-radius: 20px; background: #f1f5f9; color: #64748b; font-weight: 500;
+        transition: all 0.2s;
+    }
+    .genre-tag:hover, .genre-tag.active { background: #0EA5E9; color: white; }
+    .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px; }
+    .empty-state { text-align: center; padding: 40px; color: #64748b; grid-column: 1 / -1; }
+</style>
+{% endblock %}

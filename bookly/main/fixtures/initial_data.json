@@ -1,0 +1,323 @@
+[
+  {
+    "model": "main.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$260000$...",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "system_author",
+      "first_name": "Bookly",
+      "last_name": "Admin",
+      "email": "admin@bookly.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2023-01-01T00:00:00Z",
+      "is_author": true
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11",
+    "fields": {
+      "title": "Гаррі Поттер і філософський камінь",
+      "author": 1,
+      "author_name": "Дж. К. Роулінг",
+      "description": "Хлопчик, який вижив, дізнається, що він чарівник і вирушає до школи магії Гоґвортс.",
+      "genre": "Фентезі",
+      "cover_url": "https://images-na.ssl-images-amazon.com/images/I/81YOuOGFCJL.jpg",
+      "pdf_path": "/static/books/harry_potter_1.pdf",
+      "total_pages": 300,
+      "daily_price": "15.00",
+      "monthly_price": "150.00",
+      "rating": 4.8,
+      "rentals_count": 42,
+      "created_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a12",
+    "fields": {
+      "title": "Кобзар",
+      "author": 1,
+      "author_name": "Тарас Шевченко",
+      "description": "Збірка поетичних творів Тараса Шевченка. Безсмертна класика української літератури.",
+      "genre": "Українська класика",
+      "cover_url": "https://book-ye.com.ua/upload/resize_cache/iblock/e9c/520_860_1/1d0a6493_7105_11e7_80c7_000c29ae1566_662f5926_7458_11e7_80c7_000c29ae1566.jpg",
+      "pdf_path": "/static/books/kobzar.pdf",
+      "total_pages": 450,
+      "daily_price": "10.00",
+      "monthly_price": "100.00",
+      "rating": 5.0,
+      "rentals_count": 120,
+      "created_at": "2023-01-02T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "c2eebc99-9c0b-4ef8-bb6d-6bb9bd380a13",
+    "fields": {
+      "title": "Дюна",
+      "author": 1,
+      "author_name": "Френк Герберт",
+      "description": "Епічна науково-фантастична сага про пустельну планету Арракіс, прянощі та політичні інтриги.",
+      "genre": "Фантастика",
+      "cover_url": "https://m.media-amazon.com/images/I/91Fq9AMNuXL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/dune.pdf",
+      "total_pages": 600,
+      "daily_price": "20.00",
+      "monthly_price": "200.00",
+      "rating": 4.9,
+      "rentals_count": 85,
+      "created_at": "2023-01-03T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "d3eebc99-9c0b-4ef8-bb6d-6bb9bd380a14",
+    "fields": {
+      "title": "1984",
+      "author": 1,
+      "author_name": "Джордж Орвелл",
+      "description": "Антиутопія про тоталітарний режим, де Великий Брат стежить за тобою.",
+      "genre": "Антиутопія",
+      "cover_url": "https://m.media-amazon.com/images/I/71kxa1-0mfL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/1984.pdf",
+      "total_pages": 328,
+      "daily_price": "12.00",
+      "monthly_price": "120.00",
+      "rating": 4.7,
+      "rentals_count": 90,
+      "created_at": "2023-01-04T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "e4eebc99-9c0b-4ef8-bb6d-6bb9bd380a15",
+    "fields": {
+      "title": "Пригоди Шерлока Холмса",
+      "author": 1,
+      "author_name": "Артур Конан Дойл",
+      "description": "Збірка детективних оповідань про найвідомішого сищика усіх часів.",
+      "genre": "Детектив",
+      "cover_url": "https://m.media-amazon.com/images/I/81+H4l3+bXL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/sherlock.pdf",
+      "total_pages": 350,
+      "daily_price": "14.00",
+      "monthly_price": "140.00",
+      "rating": 4.8,
+      "rentals_count": 60,
+      "created_at": "2023-01-05T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "f5eebc99-9c0b-4ef8-bb6d-6bb9bd380a16",
+    "fields": {
+      "title": "Сяйво",
+      "author": 1,
+      "author_name": "Стівен Кінг",
+      "description": "Жахлива історія про готель 'Оверлук' і божевілля, що охоплює його доглядача.",
+      "genre": "Жахи",
+      "cover_url": "https://m.media-amazon.com/images/I/81AfM9-gLSL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/shining.pdf",
+      "total_pages": 500,
+      "daily_price": "18.00",
+      "monthly_price": "180.00",
+      "rating": 4.6,
+      "rentals_count": 45,
+      "created_at": "2023-01-06T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "a6eebc99-9c0b-4ef8-bb6d-6bb9bd380a17",
+    "fields": {
+      "title": "Думай повільно... Вирішуй швидко",
+      "author": 1,
+      "author_name": "Даніел Канеман",
+      "description": "Книга нобелівського лауреата про те, як працює наш мозок і як ми приймаємо рішення.",
+      "genre": "Психологія",
+      "cover_url": "https://m.media-amazon.com/images/I/61fdrEuPJwL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/thinking_fast.pdf",
+      "total_pages": 480,
+      "daily_price": "25.00",
+      "monthly_price": "250.00",
+      "rating": 4.9,
+      "rentals_count": 110,
+      "created_at": "2023-01-07T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "b7eebc99-9c0b-4ef8-bb6d-6bb9bd380a18",
+    "fields": {
+      "title": "Тіні забутих предків",
+      "author": 1,
+      "author_name": "Михайло Коцюбинський",
+      "description": "Повість про кохання Івана та Марічки з ворогуючих родів на Гуцульщині.",
+      "genre": "Українська класика",
+      "cover_url": "https://static.yakaboo.ua/media/catalog/product/i/m/img_616_1_59.jpg",
+      "pdf_path": "/static/books/tini.pdf",
+      "total_pages": 120,
+      "daily_price": "8.00",
+      "monthly_price": "80.00",
+      "rating": 4.8,
+      "rentals_count": 70,
+      "created_at": "2023-01-08T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "c8eebc99-9c0b-4ef8-bb6d-6bb9bd380a19",
+    "fields": {
+      "title": "Sapiens: Людина розумна",
+      "author": 1,
+      "author_name": "Ювал Ной Харарі",
+      "description": "Коротка історія людства від кам'яного віку до наших днів.",
+      "genre": "Історія",
+      "cover_url": "https://m.media-amazon.com/images/I/713jIoMO3UL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/sapiens.pdf",
+      "total_pages": 550,
+      "daily_price": "22.00",
+      "monthly_price": "220.00",
+      "rating": 4.8,
+      "rentals_count": 130,
+      "created_at": "2023-01-09T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "d9eebc99-9c0b-4ef8-bb6d-6bb9bd380a20",
+    "fields": {
+      "title": "Маленький принц",
+      "author": 1,
+      "author_name": "Антуан де Сент-Екзюпері",
+      "description": "Філософська казка про хлопчика з іншої планети, троянду та лиса.",
+      "genre": "Дитяча література",
+      "cover_url": "https://m.media-amazon.com/images/I/71O1d90jLlL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/little_prince.pdf",
+      "total_pages": 96,
+      "daily_price": "10.00",
+      "monthly_price": "90.00",
+      "rating": 5.0,
+      "rentals_count": 200,
+      "created_at": "2023-01-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "e0eebc99-9c0b-4ef8-bb6d-6bb9bd380a21",
+    "fields": {
+      "title": "Відьмак: Останнє бажання",
+      "author": 1,
+      "author_name": "Анджей Сапковський",
+      "description": "Історії про Ґеральта з Рівії — відьмака, що за гроші вбиває чудовиськ.",
+      "genre": "Фентезі",
+      "cover_url": "https://m.media-amazon.com/images/I/71s6U5Zg3OL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/witcher.pdf",
+      "total_pages": 380,
+      "daily_price": "16.00",
+      "monthly_price": "160.00",
+      "rating": 4.9,
+      "rentals_count": 95,
+      "created_at": "2023-01-11T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "f1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22",
+    "fields": {
+      "title": "Багатий тато, Бідний тато",
+      "author": 1,
+      "author_name": "Роберт Кійосакі",
+      "description": "Книга про фінансову грамотність та інвестування.",
+      "genre": "Бізнес",
+      "cover_url": "https://m.media-amazon.com/images/I/81bsw6fnUiL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/rich_dad.pdf",
+      "total_pages": 336,
+      "daily_price": "20.00",
+      "monthly_price": "200.00",
+      "rating": 4.5,
+      "rentals_count": 150,
+      "created_at": "2023-01-12T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "a2eebc99-9c0b-4ef8-bb6d-6bb9bd380a23",
+    "fields": {
+      "title": "Гордість і упередження",
+      "author": 1,
+      "author_name": "Джейн Остін",
+      "description": "Романтична історія про Елізабет Беннет і містера Дарсі.",
+      "genre": "Романтика",
+      "cover_url": "https://m.media-amazon.com/images/I/71Q1tPupKjL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/pride.pdf",
+      "total_pages": 430,
+      "daily_price": "12.00",
+      "monthly_price": "120.00",
+      "rating": 4.7,
+      "rentals_count": 80,
+      "created_at": "2023-01-13T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "b3eebc99-9c0b-4ef8-bb6d-6bb9bd380a24",
+    "fields": {
+      "title": "Володар перснів: Хранителі Персня",
+      "author": 1,
+      "author_name": "Дж. Р. Р. Толкін",
+      "description": "Початок великої подорожі Фродо Беггінса до Рокової Гори.",
+      "genre": "Фентезі",
+      "cover_url": "https://m.media-amazon.com/images/I/91dSMhdIzTL._AC_UF1000,1000_QL80_.jpg",
+      "pdf_path": "/static/books/lotr.pdf",
+      "total_pages": 500,
+      "daily_price": "18.00",
+      "monthly_price": "180.00",
+      "rating": 5.0,
+      "rentals_count": 160,
+      "created_at": "2023-01-14T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "c4eebc99-9c0b-4ef8-bb6d-6bb9bd380a25",
+    "fields": {
+      "title": "Кайдашева сім'я",
+      "author": 1,
+      "author_name": "Іван Нечуй-Левицький",
+      "description": "Реалістична повість про життя українського села та вічні сімейні конфлікти.",
+      "genre": "Українська класика",
+      "cover_url": "https://static.yakaboo.ua/media/catalog/product/c/o/cover_184_48.jpg",
+      "pdf_path": "/static/books/kaydash.pdf",
+      "total_pages": 240,
+      "daily_price": "9.00",
+      "monthly_price": "90.00",
+      "rating": 4.6,
+      "rentals_count": 65,
+      "created_at": "2023-01-15T00:00:00Z"
+    }
+  },
+  {
+    "model": "main.book",
+    "pk": "f2eebc99-9c0b-4ef8-bb6d-6bb9bd380a26",
+    "fields": {
+      "title": "Лисяча нора",
+      "author": 1,
+      "author_name": "Нора Сакавіч",
+      "description": "Сенсаційна трилогія письменниці Нори Сакавіч «Усе заради гри». Головний герой, Ніл Джостен, ховається від свого темного минулого, однак, ставши частиною команди «Лисів», змушений боротися не лише з суперниками, а й із новоспеченими товаришами.",
+      "genre": "Сучасна проза",
+      "cover_url": "https://m.media-amazon.com/images/I/51r+2+w+L+L.jpg",
+      "pdf_path": "/static/books/foxhole.pdf",
+      "total_pages": 340,
+      "daily_price": "15.00",
+      "monthly_price": "150.00",
+      "rating": 4.9,
+      "rentals_count": 0,
+      "created_at": "2023-02-01T00:00:00Z"
+    }
+  }
+]
