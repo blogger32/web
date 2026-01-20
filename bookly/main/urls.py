@@ -15,7 +15,23 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),  # bookly.com/logout/
 
     # --- Функції (POST-запити) ---
-    path('rent/', views.create_rental, name='create_rental'),
+    path('create-checkout-session/', views.create_checkout_session, name='create_checkout_session'),
+    path('payment-success/', views.payment_success, name='payment_success'),
     path('favorite/', views.toggle_favorite, name='toggle_favorite'),
     path('progress/update/<uuid:rental_id>/', views.update_progress, name='update_progress'),
+    # ... інші url
+    path('english/', views.english_catalog, name='english_catalog'),
+    path('dictionary/', views.dictionary_view, name='dictionary'),
+    path('learn/', views.learn_words, name='learn_words'),
+    path('api/get_question/', views.get_learn_question_api, name='get_learn_question'),
+    path('api/define_word/', views.get_word_definition, name='define_word'),
+    path('api/add_word/', views.add_word_api, name='add_word_api'),
+    path('dictionary/', views.dictionary_view, name='dictionary'),
+    path('cabinet/', views.author_dashboard, name='author_dashboard'),
+    path('cabinet/add/', views.add_book, name='add_book'),
+    path('bookmarks/', views.bookmarks, name='bookmarks'),
+    path('profile/', views.profile_view, name='profile'),
+    path('premium/', views.premium_page, name='premium_page'),
+    path('premium/buy/', views.create_premium_checkout, name='create_premium_checkout'),
+    path('premium/success/', views.premium_success, name='premium_success'),
 ]

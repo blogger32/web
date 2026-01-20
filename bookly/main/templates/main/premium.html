@@ -1,0 +1,96 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Bookly Premium{% endblock %}
+
+{% block main_content %}
+<div style="max-width: 1000px; margin: 10px auto 40px; text-align: center;">
+
+    <h1 style="margin-bottom: 10px; font-size: 2rem; color: #0f172a;">Оформлення підписки</h1>
+    <p style="color: #64748b; margin-bottom: 50px;">Оберіть план, який підходить саме вам</p>
+
+    <div class="pricing-container">
+
+        <div class="pricing-card">
+            <h3 class="plan-title">Bookly Free</h3>
+            <div class="plan-price">Безкоштовно</div>
+
+            <ul class="plan-features">
+                <li><span class="check">✔</span> Доступ до бібліотеки</li>
+                <li><span class="check">✔</span> Переклад <strong>50 слів</strong> в день</li>
+                <li><span class="check">✔</span> Словник <strong>20 слів</strong> в день</li>
+                <li class="disabled"><span class="dot">●</span> Озвучка тексту</li>
+                <li class="disabled"><span class="dot">●</span> Безлімітний переклад</li>
+            </ul>
+
+            <button class="btn-current">Використовується зараз</button>
+        </div>
+
+        <div class="pricing-card premium">
+            <h3 class="plan-title">Bookly Premium</h3>
+            <div class="plan-price">2.00 $ / місяць</div>
+
+            <ul class="plan-features">
+                <li><span class="check">✔</span> Доступ до бібліотеки</li>
+                <li><span class="check">✔</span> <strong>Безлімітний</strong> переклад слів</li>
+                <li><span class="check">✔</span> <strong>Безлімітний</strong> словник</li>
+                <li><span class="check">✔</span> <strong>Озвучка</strong> (Text-to-Speech)</li>
+                <li><span class="check">✔</span> Пріоритетна підтримка</li>
+            </ul>
+
+            <a href="{% url 'create_premium_checkout' %}" class="btn-primary">Придбати підписку</a>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .pricing-container {
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+    }
+
+    .pricing-card {
+        background: white;
+        border-radius: 24px;
+        padding: 40px;
+        width: 350px;
+        text-align: left;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.02); /* Легка тінь для Free */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pricing-card.premium {
+        box-shadow: 0 20px 40px rgba(59, 130, 246, 0.15); /* Велика тінь для Premium */
+        border: 2px solid #3b82f6; /* Синя рамка, можна прибрати */
+        transform: scale(1.05); /* Трохи збільшена */
+    }
+
+    .plan-title { font-size: 1.2rem; color: #475569; margin-bottom: 20px; text-align: center; }
+    .plan-price { font-size: 1.8rem; font-weight: 700; color: #0f172a; margin-bottom: 40px; text-align: center; }
+
+    .plan-features { list-style: none; padding: 0; margin-bottom: 40px; flex-grow: 1; }
+    .plan-features li { margin-bottom: 15px; color: #334155; display: flex; align-items: center; gap: 10px; font-size: 0.95rem; }
+
+    .check { color: #10b981; font-weight: bold; } /* Зелена галочка */
+    .dot { color: #cbd5e1; font-weight: bold; font-size: 1.2rem; } /* Сіра крапка */
+    .disabled { color: #94a3b8; }
+
+    /* Кнопки */
+    .btn-current {
+        width: 100%; padding: 15px; border-radius: 12px; border: none;
+        background: #f1f5f9; color: #94a3b8; font-weight: 600; cursor: default;
+    }
+
+    .btn-primary {
+        display: block; width: 100%; padding: 15px; border-radius: 12px;
+        background: #3b82f6; color: white; font-weight: 600; text-align: center;
+        text-decoration: none; transition: background 0.2s;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    .btn-primary:hover { background: #2563eb; }
+</style>
+{% endblock %}

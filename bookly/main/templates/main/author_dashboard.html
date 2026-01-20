@@ -1,0 +1,153 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Кабінет Автора{% endblock %}
+
+{% block main_content %}
+<style>
+    .cabinet-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+
+    .cabinet-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
+    .cabinet-title h1 { font-size: 2rem; margin-bottom: 5px; color: #0f172a; }
+    .cabinet-title p { color: #64748b; }
+
+    .btn-create {
+        background: #0f172a; color: white; padding: 12px 24px; border-radius: 12px;
+        text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px;
+        transition: transform 0.2s;
+    }
+    .btn-create:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+
+    /* STATS GRID */
+    .stats-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-bottom: 40px;
+    }
+
+    .stat-card {
+        background: white; padding: 24px; border-radius: 16px; border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-icon {
+        width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+        font-size: 1.5rem; margin-bottom: 16px;
+    }
+    .stat-label { color: #64748b; font-size: 0.9rem; margin-bottom: 4px; }
+    .stat-value { font-size: 1.8rem; font-weight: 800; color: #0f172a; }
+
+    /* Income Card Style */
+    .stat-card.income .stat-icon { background: #dcfce7; color: #166534; }
+    .stat-card.reads .stat-icon { background: #dbeafe; color: #1e40af; }
+    .stat-card.books .stat-icon { background: #f3f4f6; color: #374151; }
+
+    /* BOOKS TABLE */
+    .books-section h2 { margin-bottom: 20px; font-size: 1.5rem; }
+
+    .books-table-wrapper {
+        background: white; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th { text-align: left; padding: 16px 24px; background: #f8fafc; color: #64748b; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+    td { padding: 16px 24px; border-top: 1px solid #e2e8f0; vertical-align: middle; }
+
+    .book-cell { display: flex; align-items: center; gap: 16px; }
+    .book-thumb { width: 40px; height: 60px; object-fit: cover; border-radius: 4px; background: #eee; }
+    .book-info h4 { margin: 0; font-size: 1rem; color: #0f172a; }
+    .book-info span { font-size: 0.85rem; color: #64748b; }
+
+    .status-badge {
+        padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+        background: #dcfce7; color: #166534; /* Green for published */
+    }
+
+    .action-link { color: #3b82f6; text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+    .action-link:hover { text-decoration: underline; }
+
+    .empty-dashboard {
+        text-align: center; padding: 60px; background: white; border-radius: 16px; border: 1px dashed #cbd5e1;
+    }
+</style>
+
+<div class="cabinet-wrapper">
+    <div class="cabinet-header">
+        <div class="cabinet-title">
+            <h1>Привіт, {{ user.first_name }}! 👋</h1>
+            <p>Ось статистика твоїх публікацій.</p>
+        </div>
+        <a href="{% url 'add_book' %}" class="btn-create">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Опублікувати книгу
+        </a>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card income">
+            <div class="stat-icon">💰</div>
+            <div class="stat-label">Загальний дохід</div>
+            <div class="stat-value">{{ total_income }} ₴</div>
+        </div>
+
+        <div class="stat-card reads">
+            <div class="stat-icon">📖</div>
+            <div class="stat-label">Всього читань (оренд)</div>
+            <div class="stat-value">{{ total_rentals }}</div>
+        </div>
+
+        <div class="stat-card books">
+            <div class="stat-icon">📚</div>
+            <div class="stat-label">Опубліковано книг</div>
+            <div class="stat-value">{{ total_books }}</div>
+        </div>
+    </div>
+
+    <div class="books-section">
+        <h2>Мої книги</h2>
+
+        {% if my_books %}
+        <div class="books-table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Книга</th>
+                        <th>Жанр</th>
+                        <th>Читань</th>
+                        <th>Ціна (день/міс)</th>
+                        <th>Статус</th>
+                        <th>Дії</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for book in my_books %}
+                    <tr>
+                        <td>
+                            <div class="book-cell">
+                                <img src="{{ book.cover_url }}" alt="" class="book-thumb">
+                                <div class="book-info">
+                                    <h4>{{ book.title }}</h4>
+                                    <span>{{ book.created_at|date:"d.m.Y" }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ book.genre }}</td>
+                        <td>{{ book.rentals_count }}</td>
+                        <td>{{ book.daily_price }} / {{ book.monthly_price }} ₴</td>
+                        <td><span class="status-badge">Активна</span></td>
+                        <td>
+                            <a href="{% url 'book_details' book.id %}" class="action-link">Переглянути</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="empty-dashboard">
+                <h3>У вас ще немає опублікованих книг</h3>
+                <p style="color: #64748b; margin-bottom: 20px;">Почніть заробляти на своїй творчості вже сьогодні.</p>
+                <a href="{% url 'add_book' %}" class="btn-create" style="display: inline-flex;">Створити першу книгу</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

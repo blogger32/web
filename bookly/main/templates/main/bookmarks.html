@@ -1,0 +1,116 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Мої закладки{% endblock %}
+
+{% block main_content %}
+<style>
+    .page-header { margin-bottom: 30px; }
+    .page-title { font-size: 2rem; font-weight: 700; color: #0f172a; margin-bottom: 10px; }
+
+    .bookmarks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 30px;
+    }
+
+    .bookmark-card {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        display: flex;
+        gap: 20px;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .bookmark-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        border-color: #cbd5e1;
+    }
+
+    .book-cover {
+        width: 80px;
+        height: 120px;
+        border-radius: 8px;
+        object-fit: cover;
+        background-color: #f1f5f9;
+        flex-shrink: 0;
+    }
+
+    .book-info {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .book-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-bottom: 5px;
+    }
+
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #475569;
+        margin-top: auto;
+        margin-bottom: 8px;
+    }
+
+    .progress-bar-bg {
+        width: 100%;
+        height: 8px;
+        background: #f1f5f9;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #3b82f6, #2563eb);
+        border-radius: 4px;
+    }
+</style>
+
+<div class="page-header">
+    <h1 class="page-title">🔖 Мої закладки</h1>
+    <p style="color: #64748b;">Продовжуйте читати з того місця, де зупинилися.</p>
+</div>
+
+{% if reading_list %}
+    <div class="bookmarks-grid">
+        {% for item in reading_list %}
+            <a href="{% url 'reader' item.rental.id %}" class="bookmark-card">
+                <img src="{{ item.book.cover_url }}" alt="" class="book-cover">
+
+                <div class="book-info">
+                    <div class="book-title">{{ item.book.title }}</div>
+
+                    <div class="progress-text">
+                        <span>Сторінка {{ item.current_page }}</span>
+                        <span>{% widthratio item.current_page item.total_pages 100 %}%</span>
+                    </div>
+
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" style="width: {% widthratio item.current_page item.total_pages 100 %}%;"></div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div style="text-align: center; padding: 60px; background: white; border-radius: 20px; border: 1px dashed #cbd5e1;">
+        <h2>Ви поки що нічого не читаєте</h2>
+        <a href="{% url 'catalog' %}" style="color: #3b82f6; font-weight: 600;">Перейти в каталог →</a>
+    </div>
+{% endif %}
+
+{% endblock %}

@@ -78,6 +78,11 @@ DATABASES = {
     }
 }
 
+# STRIPE SETTINGS
+STRIPE_PUBLIC_KEY = 'pk_test_51SrOprLBCVZvx58R58zWsjgWg8G0HZBPHYY6mjVqZ9b1gOcgHGBxk3oLaQjf7nctVKUTK4ACEn3r20JxJWQ75TiJ00umeJlDls'  # Вставте свій
+STRIPE_SECRET_KEY = 'sk_test_51SrOprLBCVZvx58RstDPTyiQSwJNJcNGElSUeIn2iD5OvbHViDimPAbtxZB0x9peWksvXAfycD7ZZlnUFMIJXVvQ00t0zRzn04'  # Вставте свій
+STRIPE_CURRENCY = 'uah'  # Гривня
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

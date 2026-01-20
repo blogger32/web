@@ -1,16 +1,18 @@
 {% extends 'main/layout.html' %}
 {% load static %}
 
-{% block title %}Дашборд - Bookly{% endblock %}
+{% block title %}English Books | Bookly{% endblock %}
 
 {% block main_content %}
 <div class="dashboard-container">
-    <h1 class="page-title">Головна</h1>
-
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2rem;">
+        <span style="font-size: 2rem;">🇬🇧</span>
+        <h1 class="page-title" style="margin: 0;">English Library</h1>
+    </div>
 
     <section class="shelf-section">
         <div class="section-header">
-            <h2 class="section-title">Рекомендації для вас</h2>
+            <h2 class="section-title">Recommended for You</h2>
         </div>
 
         <div class="shelf-wrapper">
@@ -20,6 +22,8 @@
                 <div class="shelf-track">
                     {% for book in recommended_books %}
                         {% include "main/partials/book_card.html" with book=book %}
+                    {% empty %}
+                        <p style="padding: 20px; color: #64748b;">No English books found yet.</p>
                     {% endfor %}
                 </div>
             </div>
@@ -32,15 +36,14 @@
     <section class="shelf-section">
         <div class="section-header">
             <h2 class="section-title">{{ genre }}</h2>
-            <a href="{% url 'catalog' %}?genre={{ genre }}" class="see-all-link">Всі</a>
-        </div>
+            </div>
 
         <div class="shelf-wrapper">
             <button class="scroll-btn left-btn" onclick="scrollShelf(this, -300)">‹</button>
 
             <div class="shelf-scroll-container">
                 <div class="shelf-track">
-                    {% for book in recommended_books %}
+                    {% for book in books %}
                         {% if book.genre == genre %}
                             {% include "main/partials/book_card.html" with book=book %}
                         {% endif %}
@@ -53,6 +56,4 @@
     </section>
     {% endfor %}
 </div>
-
-
 {% endblock %}

@@ -1,0 +1,196 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Мій Словник{% endblock %}
+
+{% block main_content %}
+<style>
+    /* --- СТИЛІ СЛОВНИКА --- */
+    .dictionary-wrapper {
+        padding: 40px 20px;
+        max-width: 800px;
+        margin: 0 auto;
+        min-height: calc(100vh - 80px);
+    }
+
+    .page-title {
+        text-align: center;
+        color: #334155;
+        margin-bottom: 40px;
+        font-size: 1.8rem;
+        font-weight: 600;
+    }
+
+    /* Картка слова */
+    .word-card {
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        transition: all 0.2s ease;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+
+    .word-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+        border-color: #e2e8f0;
+    }
+
+    /* Інформація про слово */
+    .word-info {
+        flex: 1;
+    }
+
+    .word-header {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 6px;
+    }
+
+    .english-word {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+
+    .transcription {
+        color: #94a3b8;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 1.1rem;
+    }
+
+    .part-of-speech {
+        font-size: 0.9rem;
+        color: #3b82f6; /* Гарний синій колір */
+        font-weight: 500;
+        margin-bottom: 12px;
+    }
+
+    .translation {
+        font-size: 1.15rem;
+        color: #334155;
+        line-height: 1.5;
+    }
+
+    /* Кнопки дій (Динамік і Видалити) */
+    .actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .icon-btn {
+        background: transparent;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 8px;
+        color: #94a3b8;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .icon-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Колір при наведенні на динамік */
+    .icon-btn.speak:hover {
+        color: #0ea5e9;
+        background-color: #e0f2fe;
+    }
+
+    /* Колір при наведенні на хрестик */
+    .icon-btn.delete:hover {
+        color: #ef4444;
+        background-color: #fee2e2;
+    }
+
+    /* Якщо словник пустий */
+    .empty-state {
+        text-align: center;
+        color: #94a3b8;
+        margin-top: 80px;
+    }
+</style>
+
+<div class="dictionary-wrapper">
+    <h1 class="page-title">Словник</h1>
+
+    {% if words %}
+        {% for item in words %}
+        <div class="word-card">
+            <div class="word-info">
+                <div class="word-header">
+                    <span class="english-word">{{ item.word }}</span>
+                    {% if item.transcription %}
+                        <span class="transcription">{{ item.transcription }}</span>
+                    {% endif %}
+                </div>
+
+                {% if item.part_of_speech %}
+                    <div class="part-of-speech">{{ item.part_of_speech }}</div>
+                {% endif %}
+
+                <div class="translation">{{ item.translation }}</div>
+            </div>
+
+            <div class="actions">
+                <button class="icon-btn speak" onclick="speakWord('{{ item.word|escapejs }}')" title="Прослухати">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                    </svg>
+                </button>
+
+                <button class="icon-btn delete" title="Видалити">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 20px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            <h3>Ваш словник порожній</h3>
+            <p>Читайте книги та додавайте незнайомі слова, щоб побачити їх тут.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    // Функція озвучки
+    function speakWord(text) {
+        if ('speechSynthesis' in window) {
+            // Зупиняємо попередню озвучку, якщо користувач клацає швидко
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US'; // Американська англійська
+            utterance.rate = 0.9;     // Трохи повільніше для чіткості
+
+            // Спробуємо знайти кращий голос (наприклад, Google US English)
+            const voices = window.speechSynthesis.getVoices();
+            // Шукаємо голос, в назві якого є "English" або "US"
+            const preferredVoice = voices.find(voice => voice.name.includes("Google US English") || voice.lang === "en-US");
+
+            if (preferredVoice) {
+                utterance.voice = preferredVoice;
+            }
+
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("На жаль, ваш браузер не підтримує озвучку.");
+        }
+    }
+</script>
+{% endblock %}

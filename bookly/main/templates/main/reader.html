@@ -4,34 +4,18 @@
 {% block title %}{{ book.title }} | Читання{% endblock %}
 
 {% block main_content %}
-<script src="{% static 'main/js/pdf.min.js' %}"></script>
-<script>
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "{% static 'main/js/pdf.worker.min.js' %}";
-</script>
 
 <style>
-    /* 1. Налаштування Layout */
-    /* Ховаємо тільки верхній пошук, щоб не заважав читати */
-    .header { display: none !important; }
-
-    /* Прибираємо внутрішні відступи контейнера, щоб читалка була на всю висоту */
-    .page-content {
-        padding: 0 !important;
-        height: 100vh; /* Висота на весь екран */
-        overflow: hidden; /* Щоб не було подвійних скролів */
-    }
-
-    /* Сайдбар залишається на місці! Ми його не чіпаємо. */
-
-    /* 2. Основна оболонка читалки */
+    /* --- ОСНОВНА ОБОЛОНКА --- */
     .reader-wrapper {
         display: flex;
         flex-direction: column;
-        height: 100%; /* Займає всю висоту main-content */
+        height: 100vh;
         background-color: #fcfcfc;
+        overflow: hidden;
     }
 
-    /* 3. Верхня панель (фіксована) */
+    /* --- ВЕРХНЯ ПАНЕЛЬ --- */
     .reader-topbar {
         height: 60px;
         background: white;
@@ -39,183 +23,366 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 0 24px;
+        padding: 0 30px;
         flex-shrink: 0;
         z-index: 20;
     }
 
     .back-btn {
         text-decoration: none; color: #64748b; font-weight: 500;
-        display: flex; align-items: center; gap: 8px; font-size: 0.95rem;
-        transition: color 0.2s;
+        display: flex; align-items: center; gap: 8px; font-size: 0.95rem; transition: color 0.2s;
     }
     .back-btn:hover { color: #0EA5E9; }
 
-    .mode-switch {
-        background: #f1f5f9; padding: 4px; border-radius: 8px; display: flex; gap: 4px;
-    }
-    .mode-btn {
-        border: none; background: none; padding: 6px 14px; font-size: 0.85rem; font-weight: 600;
-        color: #64748b; border-radius: 6px; cursor: pointer; transition: all 0.2s;
-    }
-    .mode-btn.active { background: white; color: #0f172a; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+    .book-title-header { font-weight: 600; color: #1e293b; font-size: 1.1rem; }
 
-    /* 4. Область контенту */
-    .content-area {
-        flex: 1;
-        position: relative;
-        overflow: hidden;
+    /* --- LAYOUT --- */
+    .reader-layout {
+        display: flex; flex: 1; overflow: hidden; position: relative;
     }
 
-    /* --- РЕЖИМ ТЕКСТУ (Скрол) --- */
-    .text-view-container {
-        height: 100%;
-        overflow-y: auto;
-        background-color: #fff;
-        display: none;
-        justify-content: center;
-
-        scrollbar-width: thin;
-        scrollbar-color: #cbd5e1 transparent;
+    /* --- БОКОВІ ЗОНИ (Стрілки) --- */
+    .nav-side {
+        width: 80px; display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; background-color: transparent; z-index: 10;
     }
-
-    .text-view-container::-webkit-scrollbar { width: 10px; }
-    .text-view-container::-webkit-scrollbar-track { background: transparent; }
-    .text-view-container::-webkit-scrollbar-thumb {
-        background-color: #cbd5e1;
-        border-radius: 5px;
-        border: 2px solid transparent;
-        background-clip: content-box;
-    }
-    .text-view-container::-webkit-scrollbar-thumb:hover { background-color: #94a3b8; }
-
-    .text-content {
-        max-width: 760px;
-        width: 100%;
-        padding: 40px 24px 100px 24px;
-        font-family: 'Georgia', serif;
-        font-size: 1.2rem;
-        line-height: 1.8;
-        color: #334155;
-    }
-
-    .text-content h2 {
-        font-family: 'Space Grotesk', sans-serif;
-        margin-top: 2rem; margin-bottom: 1rem; color: #0f172a; font-size: 1.8rem;
-    }
-    .text-content p { margin-bottom: 1.2rem; text-align: justify; }
-
-    /* --- РЕЖИМ PDF --- */
-    .pdf-view-container {
-        width: 100%; height: 100%;
-        display: flex; flex-direction: column;
-        background: #f1f5f9;
-        position: relative;
-    }
-    .pdf-viewport {
-        flex: 1; display: flex; justify-content: center; align-items: center; position: relative;
-    }
-    .page-canvas-wrapper {
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: white;
-        max-height: calc(100vh - 140px); max-width: calc(100% - 140px);
-        display: flex;
-    }
-    #the-canvas { display: block; max-height: 100%; max-width: 100%; object-fit: contain; }
-
-    .nav-arrow {
-        position: absolute; top: 0; bottom: 0; width: 80px;
-        background: transparent; border: none; cursor: pointer; color: #cbd5e1;
-        display: flex; align-items: center; justify-content: center; transition: color 0.2s; z-index: 10;
-    }
-    .nav-arrow:hover { color: #64748b; }
-    .arrow-left { left: 0; }
-    .arrow-right { right: 0; }
-
-    .reader-footer {
-        height: 50px; background: white; border-top: 1px solid #e2e8f0;
+    .arrow-btn {
         display: flex; align-items: center; justify-content: center;
-        font-size: 0.9rem; color: #64748b; flex-shrink: 0;
+        width: 50px; height: 50px; color: #cbd5e1; transition: all 0.2s ease;
+        border-radius: 50%; cursor: pointer;
     }
+    .arrow-btn:hover { color: #475569; background-color: rgba(0,0,0,0.04); }
+    .arrow-btn svg { width: 32px; height: 32px; }
+
+    /* --- КОНТЕЙНЕР ТЕКСТУ --- */
+    .text-view-container {
+        flex: 1; overflow-y: auto; background-color: #fff;
+        display: flex; justify-content: center;
+        scrollbar-width: thin; scrollbar-color: #cbd5e1 transparent;
+    }
+    .text-view-container::-webkit-scrollbar { width: 8px; }
+    .text-view-container::-webkit-scrollbar-track { background: transparent; }
+    .text-view-container::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 4px; }
+
+    /* --- ТИПОГРАФІКА ТА РЯДКИ --- */
+    .text-content {
+        max-width: 800px; width: 100%; padding: 40px 0 60px 0;
+        font-family: 'Georgia', 'Merriweather', serif; font-size: 1.25rem; line-height: 1.8; color: #334155;
+    }
+
+    /* Стиль рядка: Кнопка + Текст */
+    .paragraph-row {
+        display: flex;
+        align-items: flex-start; /* Вирівнювання по верху */
+        gap: 15px;
+        margin-bottom: 1.5rem;
+        position: relative;
+        border-radius: 8px;
+        transition: background 0.2s;
+        padding: 5px 10px; /* Трохи місця для фону */
+    }
+
+    .paragraph-row:hover {
+        background-color: #f8fafc; /* Легка підсвітка абзацу при наведенні */
+    }
+
+    /* Кнопка озвучки абзацу */
+    .tts-paragraph-btn {
+        background: none; border: none; cursor: pointer;
+        color: #cbd5e1; /* За замовчуванням бліда */
+        padding: 5px; margin-top: 5px; /* Трохи опустити, щоб було рівно з текстом */
+        opacity: 0; /* Схована за замовчуванням */
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    /* Показуємо кнопку, коли наводимо на абзац */
+    .paragraph-row:hover .tts-paragraph-btn {
+        opacity: 1;
+    }
+
+    /* Стан "Грає зараз" */
+    .paragraph-row.reading-active {
+        background-color: #e0f2fe; /* Блакитний фон */
+    }
+    .paragraph-row.reading-active .tts-paragraph-btn {
+        opacity: 1;
+        color: #0ea5e9; /* Синій динамік */
+        animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+
+    .tts-paragraph-btn svg { width: 20px; height: 20px; }
+    .tts-paragraph-btn:hover { color: #0ea5e9; transform: scale(1.1); }
+
+    .book-chapter {
+        font-family: system-ui, -apple-system, sans-serif;
+        color: #0f172a; font-size: 1.8rem; font-weight: 700; margin: 0;
+    }
+    .book-text { margin: 0; text-align: justify; }
+
+    /* --- ФУТЕР --- */
+    .reader-footer {
+        height: 40px; display: flex; align-items: center; justify-content: center;
+        border-top: 1px solid #f1f5f9; background-color: #fff; color: #94a3b8; font-size: 0.85rem; flex-shrink: 0;
+    }
+
+    /* --- МОБІЛЬНА АДАПТАЦІЯ --- */
+    @media (max-width: 768px) {
+        .reader-layout { flex-direction: column; }
+        .nav-side { width: 100%; height: 60px; border-top: 1px solid #eee; }
+        .nav-side.left { order: 2; }
+        .nav-side.right { order: 3; }
+        .text-view-container { padding: 0 15px; }
+
+        /* На мобільному кнопку озвучки краще показувати завжди або зробити більшою */
+        .tts-paragraph-btn { opacity: 1; color: #e2e8f0; }
+        .paragraph-row { gap: 10px; padding: 0; }
+        .paragraph-row:hover { background-color: transparent; }
+    }
+
+    /* Інтерактивні слова */
+    .interactive-word { cursor: pointer; border-radius: 3px; }
+    .interactive-word:hover { background-color: rgba(2, 132, 199, 0.1); color: #0284c7; }
+
+    /* --- МОДАЛКА (Старі стилі) --- */
+    .word-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); align-items: center; justify-content: center; }
+    .modal-content { background-color: #fff; padding: 24px; border-radius: 12px; width: 90%; max-width: 350px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; animation: popIn 0.3s ease; }
+    @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .close-modal { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; color: #999; }
+    .modal-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 5px; }
+    #modal-word { font-size: 22px; font-weight: bold; margin: 0; }
+    .transcription { color: #888; font-family: monospace; }
+    .word-type { color: #0ea5e9; font-size: 14px; margin-bottom: 5px; font-weight: 500; }
+    .translation { font-size: 18px; margin-bottom: 15px; }
+    .add-dict-btn { width: 100%; padding: 10px; background-color: #f0f9ff; color: #0284c7; border: 1px solid #bae6fd; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .add-dict-btn:hover { background-color: #e0f2fe; }
 </style>
 
 <div class="reader-wrapper">
     <header class="reader-topbar">
-        <div style="display: flex; align-items: center; gap: 20px;">
-            <a href="{% url 'dashboard' %}" class="back-btn">← Назад</a>
-            <span style="font-weight: 600; color: #1e293b;">{{ book.title }}</span>
-        </div>
+        <a href="{% url 'dashboard' %}" class="back-btn">← Назад</a>
 
-        <div class="mode-switch">
-            <button id="btn-mode-pdf" class="mode-btn active" onclick="switchMode('pdf')">PDF</button>
-            <button id="btn-mode-text" class="mode-btn" onclick="switchMode('text')">Текст</button>
-        </div>
+        <span class="book-title-header">{{ book.title }}</span>
+
+        <a href="{% url 'book_details' book.id %}?view_details=true" class="icon-btn" title="Опис книги" style="text-decoration: none; color: #64748b;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+        </a>
     </header>
 
-    <main class="content-area">
+    <div class="reader-layout">
+        <div class="nav-side left">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}" class="arrow-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg></a>
+            {% endif %}
+        </div>
 
-        <div id="view-text" class="text-view-container">
+        <main class="text-view-container">
             <div class="text-content">
-                {% if book.text_content %}
-                    {{ book.text_content|safe }}
+                {% if page_obj %}
+                    {% for paragraph_html in page_obj %}
+                        {{ paragraph_html|safe }}
+                    {% endfor %}
                 {% else %}
-                    <div style="text-align: center; color: #94a3b8; margin-top: 50px;">
+                    <div style="text-align:center; color:#94a3b8; margin-top:50px;">
                         <h2>Текст відсутній</h2>
-                        <p>Для цієї книги доступний тільки PDF режим.</p>
+                        <p>На жаль, текст для цієї книги ще не завантажено.</p>
                     </div>
                 {% endif %}
+                <div style="height: 50px;"></div>
+            </div>
+        </main>
+
+        <div class="nav-side right">
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}" class="arrow-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></a>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="reader-footer">
+        {% if page_obj %}
+            <span>Сторінка {{ page_obj.number }} із {{ page_obj.paginator.num_pages }}</span>
+        {% endif %}
+    </footer>
+
+    <div id="word-modal" class="word-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="modal-header"><h3 id="modal-word"></h3><span id="modal-transcription" class="transcription"></span></div>
+            <div class="modal-body">
+                <div class="word-type" id="modal-pos"></div>
+                <div class="translation" id="modal-translation">Завантаження...</div>
+                <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+                <button class="add-dict-btn">Додати в словник</button>
             </div>
         </div>
-
-        <div id="view-pdf" class="pdf-view-container">
-            <div class="pdf-viewport">
-                <button id="prev-btn" class="nav-arrow arrow-left">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></svg>
-                </button>
-                <div class="page-canvas-wrapper">
-                    <canvas id="the-canvas"></canvas>
-                </div>
-                <button id="next-btn" class="nav-arrow arrow-right">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></svg>
-                </button>
-            </div>
-            <footer class="reader-footer">
-                <span>Сторінка <span id="current-page-num">{{ progress.current_page }}</span> з <span id="total-pages-num">{{ book.total_pages }}</span></span>
-            </footer>
-        </div>
-
-    </main>
+    </div>
 </div>
 
 <script>
-    const PDF_URL = "{{ book.pdf_path }}";
-    let START_PAGE = {{ progress.current_page }};
-    const RENTAL_ID = "{{ rental.id }}";
-    const CSRF_TOKEN = "{{ csrf_token }}";
+    // --- ЗМІННІ ДЛЯ TTS (ОЗВУЧКИ) ---
+    let currentUtterance = null;
+    let activeRow = null; // Рядок, який зараз читається
 
-    function switchMode(mode) {
-        const pdfView = document.getElementById('view-pdf');
-        const textView = document.getElementById('view-text');
-        const btnPdf = document.getElementById('btn-mode-pdf');
-        const btnText = document.getElementById('btn-mode-text');
+    // Функція для озвучки абзацу
+    function playParagraph(btn) {
+        // 1. Зупиняємо будь-яку поточну озвучку
+        window.speechSynthesis.cancel();
 
-        if (mode === 'text') {
-            pdfView.style.display = 'none';
-            textView.style.display = 'flex';
-            btnPdf.classList.remove('active');
-            btnText.classList.add('active');
-        } else {
-            textView.style.display = 'none';
-            pdfView.style.display = 'flex';
-            btnText.classList.remove('active');
-            btnPdf.classList.add('active');
+        // Знаходимо батьківський контейнер (рядок)
+        const row = btn.closest('.paragraph-row');
+
+        // 2. Якщо ми клікнули на той самий абзац, що грав -> просто зупиняємо (пауза)
+        if (activeRow === row) {
+            row.classList.remove('reading-active');
+            activeRow = null;
+            return;
         }
+
+        // 3. Знімаємо підсвічування з попереднього
+        if (activeRow) {
+            activeRow.classList.remove('reading-active');
+        }
+
+        // 4. Отримуємо текст (ігноруючи кнопку, беремо тільки текст з p або h3)
+        // Використовуємо .innerText, він автоматично бере текст без HTML тегів
+        const textElement = row.querySelector('.book-text, .book-chapter');
+        if (!textElement) return;
+
+        const textToRead = textElement.innerText;
+
+        // 5. Запускаємо нову озвучку
+        const utterance = new SpeechSynthesisUtterance(textToRead);
+        utterance.lang = 'en-US';
+        utterance.rate = 1.0;
+
+        // Подія: коли почали читати
+        utterance.onstart = () => {
+            row.classList.add('reading-active');
+            activeRow = row;
+        };
+
+        // Подія: коли закінчили читати
+        utterance.onend = () => {
+            row.classList.remove('reading-active');
+            activeRow = null;
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. НАВІГАЦІЯ КЛАВІАТУРОЮ
+    document.addEventListener('keydown', function(event) {
+        if (event.key === "ArrowLeft") {
+            const prevBtn = document.querySelector('.nav-side.left a');
+            if (prevBtn) prevBtn.click();
+        }
+        if (event.key === "ArrowRight") {
+            const nextBtn = document.querySelector('.nav-side.right a');
+            if (nextBtn) nextBtn.click();
+        }
+    });
+
+    // 2. ІНТЕРАКТИВНІ СЛОВА (Оновлено селектор)
+    // Шукаємо текст всередині наших нових контейнерів
+    const blocks = document.querySelectorAll('.book-text, .book-chapter');
+
+    blocks.forEach(block => {
+        block.innerHTML = block.innerHTML.replace(/(?<!<[^>]*)\b([a-zA-Zа-яА-ЯіІїЇєЄґҐ'’\-]+)\b/g, function(match) {
+            return `<span class="interactive-word" data-word="${match}">${match}</span>`;
+        });
+    });
+
+    // 3. МОДАЛКА (Логіка без змін)
+    const modal = document.getElementById('word-modal');
+    const closeBtn = document.querySelector('.close-modal');
+    const addBtn = document.querySelector('.add-dict-btn');
+    const modalWord = document.getElementById('modal-word');
+    const modalTrans = document.getElementById('modal-transcription');
+    const modalTransl = document.getElementById('modal-translation');
+    const modalPos = document.getElementById('modal-pos');
+
+    document.body.addEventListener('click', function(e) {
+        if (e.target.classList.contains('interactive-word')) {
+            // Зупиняємо озвучку, якщо користувач клікає на слово
+            // window.speechSynthesis.cancel();
+            // (можна розкоментувати, якщо хочете зупиняти абзац при кліку на слово)
+
+            const word = e.target.getAttribute('data-word');
+            openModal(word);
+        }
+    });
+
+    closeBtn.onclick = () => modal.style.display = "none";
+    window.onclick = (e) => { if (e.target == modal) modal.style.display = "none"; };
+
+    function openModal(word) {
+        modal.style.display = "flex";
+        modalWord.innerText = word;
+        modalTransl.innerText = "Завантаження...";
+        modalTrans.innerText = "";
+        modalPos.innerText = "";
+
+        // Скидання кнопки
+        addBtn.innerText = "Додати в словник";
+        addBtn.style.backgroundColor = "#f0f9ff";
+        addBtn.style.color = "#0284c7";
+        addBtn.disabled = false;
+
+        fetch(`/api/define_word/?word=${word}`)
+            .then(res => res.json())
+            .then(data => {
+                modalWord.innerText = data.word || word;
+                modalTransl.innerText = data.translation || "Переклад не знайдено";
+                modalTrans.innerText = data.transcription || "";
+                modalPos.innerText = data.part_of_speech || "";
+            });
     }
 
-    {% if book.text_content %}
-        switchMode('text');
-    {% else %}
-        switchMode('pdf');
-    {% endif %}
+    addBtn.onclick = function() {
+        const word = modalWord.innerText;
+        const translation = modalTransl.innerText;
+
+        if (translation === "Завантаження...") return;
+
+        addBtn.innerText = "Збереження...";
+        fetch('/api/add_word/', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}'},
+            body: JSON.stringify({
+                word: word,
+                translation: translation,
+                transcription: modalTrans.innerText,
+                part_of_speech: modalPos.innerText
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.status === 'ok') {
+                addBtn.innerText = "✅ Додано!";
+                addBtn.style.backgroundColor = "#dcfce7";
+                addBtn.style.color = "#166534";
+            } else {
+                addBtn.innerText = "⚠️ Вже є";
+                addBtn.style.backgroundColor = "#fef9c3";
+                addBtn.style.color = "#854d0e";
+            }
+        });
+    };
+});
 </script>
 
 {% endblock %}

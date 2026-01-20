@@ -4,83 +4,248 @@
 {% block title %}{{ book.title }} - Bookly{% endblock %}
 
 {% block main_content %}
-<div class="book-details-container">
-    <div class="book-details-cover">
-        <img src="{% if book.cover_url %}{{ book.cover_url }}{% else %}{% static 'main/imgs/book_placeholder.png' %}{% endif %}" alt="{{ book.title }}">
-    </div>
 
-    <div class="book-details-info">
-        <div class="book-header">
-            <div>
-                <h1 class="book-title">{{ book.title }}</h1>
-                <p class="book-author">Автор: {{ book.author_name }}</p>
-                <span class="genre-badge">{{ book.genre }}</span>
-            </div>
+<div class="book-backdrop">
+    <div class="blur-overlay" style="background-image: url('{% if book.cover_url %}{{ book.cover_url }}{% else %}{% static 'main/imgs/book_placeholder.png' %}{% endif %}');"></div>
+    <div class="gradient-overlay"></div>
+</div>
 
-            <form action="{% url 'toggle_favorite' %}" method="POST">
+<div class="book-page-container">
+
+    <div class="book-visual-col">
+        <div class="cover-wrapper">
+            <img src="{% if book.cover_url %}{{ book.cover_url }}{% else %}{% static 'main/imgs/book_placeholder.png' %}{% endif %}" alt="{{ book.title }}" class="main-cover">
+
+            <form action="{% url 'toggle_favorite' %}" method="POST" class="fav-form">
                 {% csrf_token %}
                 <input type="hidden" name="book_id" value="{{ book.id }}">
-                <button type="submit" class="btn-favorite" title="Додати в улюблене">
-                    {% if is_favorite %}❤️{% else %}🤍{% endif %}
+                <button type="submit" class="btn-favorite {% if is_favorite %}active{% endif %}" title="Додати в улюблене">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="{% if is_favorite %}currentColor{% else %}none{% endif %}" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    <span>{% if is_favorite %}В улюбленому{% else %}В улюблене{% endif %}</span>
                 </button>
             </form>
         </div>
+    </div>
 
-        <div class="book-description">
+    <div class="book-info-col">
+        <div class="book-header">
+            <div class="badges">
+                <span class="genre-badge">{{ book.genre }}</span>
+                {% if book.rating > 4.5 %}
+                <span class="rating-badge">🔥 Бестселер</span>
+                {% endif %}
+            </div>
+
+            <h1 class="book-title">{{ book.title }}</h1>
+            <a href="#" class="book-author">
+                <span class="author-label">Автор:</span> {{ book.author_name }}
+            </a>
+        </div>
+
+        <div class="book-stats">
+            <div class="stat-item">
+                <span class="stat-icon">⭐</span>
+                <span class="stat-value">{{ book.rating }}</span>
+                <span class="stat-label">Рейтинг</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-icon">📄</span>
+                <span class="stat-value">{{ book.total_pages }}</span>
+                <span class="stat-label">Сторінок</span>
+            </div>
+            <div class="stat-divider"></div>
+            <div class="stat-item">
+                <span class="stat-icon">🌐</span>
+                <span class="stat-value">{{ book.get_language_display }}</span>
+                <span class="stat-label">Мова</span>
+            </div>
+        </div>
+
+        <div class="book-description-section">
             <h3>Про книгу</h3>
-            <p>{{ book.description }}</p>
+            <div class="description-text">
+                {{ book.description|linebreaks }}
+            </div>
         </div>
 
-        <div class="book-meta">
-            <div class="meta-item">⭐ {{ book.rating }}</div>
-            <div class="meta-item">📄 {{ book.total_pages }} сторінок</div>
-        </div>
+        <div class="action-section">
+            {% if active_rental %}
+                <div class="active-book-card">
+                    <div class="success-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    </div>
+                    <div class="active-info">
+                        <h4>Книга у вашій бібліотеці</h4>
+                        <p>Доступна для читання до {{ active_rental.end_date|date:"d.m.Y" }}</p>
+                    </div>
+                    <a href="{% url 'reader' active_rental.id %}" class="btn-read-now">
+                        Продовжити читати →
+                    </a>
+                </div>
 
-        <div class="rental-actions">
-            <div class="rental-option">
-                <div class="price">{{ book.daily_price }} грн</div>
-                <div class="period">за 1 день</div>
-                <form action="{% url 'create_rental' %}" method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="book_id" value="{{ book.id }}">
-                    <input type="hidden" name="rental_type" value="daily">
-                    <button type="submit" class="btn-primary">Орендувати на день</button>
-                </form>
-            </div>
+            {% else %}
+                <h3>Оберіть варіант оренди:</h3>
+                <div class="rental-grid">
+                    <div class="rental-card">
+                        <div class="card-header">
+                            <span class="period">1 день</span>
+                            <span class="price">{{ book.daily_price }} <small>грн</small></span>
+                        </div>
+                        <p class="card-desc">Швидкий доступ на 24 години</p>
+                        <form action="{% url 'create_checkout_session' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="book_id" value="{{ book.id }}">
+                            <input type="hidden" name="rental_type" value="daily">
+                            <button type="submit" class="btn-rent basic">Орендувати</button>
+                        </form>
+                    </div>
 
-            <div class="rental-option recommended">
-                <div class="badge">Вигідно</div>
-                <div class="price">{{ book.monthly_price }} грн</div>
-                <div class="period">за 30 днів</div>
-                <form action="{% url 'create_rental' %}" method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="book_id" value="{{ book.id }}">
-                    <input type="hidden" name="rental_type" value="monthly">
-                    <button type="submit" class="btn-primary full-width">Орендувати на місяць</button>
-                </form>
-            </div>
+                    <div class="rental-card recommended">
+                        <div class="best-value-badge">Вигідно</div>
+                        <div class="card-header">
+                            <span class="period">30 днів</span>
+                            <span class="price">{{ book.monthly_price }} <small>грн</small></span>
+                        </div>
+                        <p class="card-desc">Читайте у своєму темпі цілий місяць</p>
+                        <form action="{% url 'create_checkout_session' %}" method="POST">
+                            {% csrf_token %}
+                            <input type="hidden" name="book_id" value="{{ book.id }}">
+                            <input type="hidden" name="rental_type" value="monthly">
+                            <button type="submit" class="btn-rent premium">Орендувати</button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
 </div>
 
 <style>
-    .book-details-container { display: flex; gap: 40px; align-items: flex-start; }
-    .book-details-cover img { width: 300px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-    .book-details-info { flex: 1; }
-    .book-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
-    .book-title { font-size: 2.5rem; line-height: 1.2; margin-bottom: 8px; }
-    .book-author { font-size: 1.2rem; color: #64748b; }
-    .genre-badge { display: inline-block; padding: 4px 12px; background: #e0f2fe; color: #0284c7; border-radius: 16px; font-size: 0.9rem; margin-top: 8px; }
-    .btn-favorite { background: none; border: none; font-size: 2rem; cursor: pointer; transition: transform 0.2s; }
-    .btn-favorite:hover { transform: scale(1.1); }
-    .book-description { margin-bottom: 32px; color: #334155; }
-    .book-meta { display: flex; gap: 24px; margin-bottom: 32px; font-weight: 500; }
+    /* --- Layout & Background --- */
+    .book-backdrop {
+        position: fixed; top: 0; left: 0; width: 100%; height: 60vh; z-index: 0; pointer-events: none; overflow: hidden;
+    }
+    .blur-overlay {
+        width: 100%; height: 100%; background-size: cover; background-position: center; filter: blur(60px); opacity: 0.4; transform: scale(1.2);
+    }
+    .gradient-overlay {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: linear-gradient(to bottom, rgba(255,255,255,0.8), #f8fafc 100%);
+    }
 
-    .rental-actions { display: flex; gap: 24px; }
-    .rental-option { border: 1px solid #e2e8f0; padding: 24px; border-radius: 12px; text-align: center; flex: 1; position: relative; }
-    .rental-option.recommended { border: 2px solid #0EA5E9; background: #f0f9ff; }
-    .rental-option .badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #0EA5E9; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold; }
-    .rental-option .price { font-size: 1.5rem; font-weight: bold; color: #0f172a; }
-    .rental-option .period { color: #64748b; margin-bottom: 16px; }
+    .book-page-container {
+        position: relative; z-index: 1; max-width: 1100px; margin: 40px auto; padding: 0 20px;
+        display: grid; grid-template-columns: 350px 1fr; gap: 60px; align-items: start;
+    }
+
+    /* --- Visual Column --- */
+    .cover-wrapper { position: sticky; top: 100px; text-align: center; }
+    .main-cover {
+        width: 100%; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        aspect-ratio: 2/3; object-fit: cover;
+    }
+
+    .fav-form { margin-top: 20px; }
+    .btn-favorite {
+        width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+        padding: 12px; border: 2px solid #e2e8f0; background: white; border-radius: 12px;
+        cursor: pointer; font-weight: 600; color: #64748b; transition: all 0.2s;
+    }
+    .btn-favorite:hover { border-color: #cbd5e1; background: #f8fafc; }
+    .btn-favorite.active { color: #ef4444; border-color: #fecaca; background: #fef2f2; }
+    .btn-favorite svg { transition: transform 0.2s; }
+    .btn-favorite:hover svg { transform: scale(1.1); }
+
+    /* --- Info Column --- */
+    .book-header { margin-bottom: 30px; }
+    .badges { display: flex; gap: 10px; margin-bottom: 15px; }
+    .genre-badge { background: #0f172a; color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.5px; }
+    .rating-badge { background: #fbbf24; color: #78350f; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 700; }
+
+    .book-title { font-size: 3rem; line-height: 1.1; color: #0f172a; margin-bottom: 10px; letter-spacing: -1px; }
+    .book-author { font-size: 1.25rem; color: #3b82f6; text-decoration: none; font-weight: 500; }
+    .author-label { color: #64748b; font-weight: 400; }
+
+    /* --- Stats --- */
+    .book-stats {
+        display: flex; align-items: center; gap: 20px; padding: 20px 0;
+        border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; margin-bottom: 30px;
+    }
+    .stat-item { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 0 10px; }
+    .stat-value { font-weight: 800; font-size: 1.2rem; color: #0f172a; }
+    .stat-label { font-size: 0.85rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-divider { width: 1px; height: 30px; background: #e2e8f0; }
+
+    /* --- Description --- */
+    .book-description-section h3 { font-size: 1.3rem; margin-bottom: 15px; color: #0f172a; }
+    .description-text { font-size: 1.1rem; line-height: 1.7; color: #334155; }
+
+    /* --- Rentals --- */
+    .action-section { margin-top: 40px; }
+    .action-section h3 { font-size: 1.1rem; margin-bottom: 20px; color: #64748b; }
+
+    .rental-grid { display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: end; }
+
+    .rental-card {
+        background: white; border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px;
+        transition: transform 0.2s, box-shadow 0.2s; position: relative;
+    }
+    .rental-card:hover { transform: translateY(-4px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+    .rental-card.recommended {
+        border: 2px solid #3b82f6; background: #eff6ff;
+    }
+
+    .best-value-badge {
+        position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+        background: #3b82f6; color: white; padding: 4px 12px; border-radius: 12px;
+        font-size: 0.75rem; font-weight: 800; text-transform: uppercase;
+    }
+
+    .card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .card-header .period { font-size: 1.1rem; font-weight: 700; color: #0f172a; }
+    .card-header .price { font-size: 1.5rem; font-weight: 800; color: #0f172a; }
+    .card-header .price small { font-size: 0.9rem; font-weight: 500; color: #64748b; }
+    .card-desc { font-size: 0.9rem; color: #64748b; margin-bottom: 20px; }
+
+    .btn-rent {
+        width: 100%; padding: 14px; border: none; border-radius: 10px; cursor: pointer;
+        font-weight: 700; font-size: 1rem; transition: all 0.2s;
+    }
+    .btn-rent.basic { background: #f1f5f9; color: #334155; }
+    .btn-rent.basic:hover { background: #e2e8f0; }
+    .btn-rent.premium { background: #3b82f6; color: white; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3); }
+    .btn-rent.premium:hover { background: #2563eb; transform: scale(1.02); }
+
+    /* --- Active Book State --- */
+    .active-book-card {
+        background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 16px; padding: 25px;
+        display: flex; align-items: center; gap: 20px;
+    }
+    .success-icon {
+        width: 50px; height: 50px; background: #dcfce7; color: #166534;
+        border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+    .active-info h4 { color: #166534; font-size: 1.1rem; margin-bottom: 4px; }
+    .active-info p { color: #15803d; margin: 0; font-size: 0.9rem; }
+    .btn-read-now {
+        margin-left: auto; background: #166534; color: white; padding: 12px 24px;
+        border-radius: 10px; text-decoration: none; font-weight: 600; transition: all 0.2s;
+    }
+    .btn-read-now:hover { background: #14532d; transform: translateX(5px); }
+
+    /* --- Mobile --- */
+    @media (max-width: 900px) {
+        .book-page-container { grid-template-columns: 1fr; gap: 30px; }
+        .cover-wrapper { position: relative; top: 0; max-width: 300px; margin: 0 auto; }
+        .book-title { font-size: 2.2rem; }
+        .rental-grid { grid-template-columns: 1fr; }
+        .active-book-card { flex-direction: column; text-align: center; }
+        .btn-read-now { margin: 0; width: 100%; text-align: center; }
+    }
 </style>
+
 {% endblock %}

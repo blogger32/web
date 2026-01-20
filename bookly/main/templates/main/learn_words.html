@@ -1,0 +1,289 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+
+{% block title %}Вчити слова{% endblock %}
+
+{% block main_content %}
+<style>
+    /* --- GAME CONTAINER --- */
+    .game-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: calc(100vh - 80px);
+        background-color: #f8fafc;
+        padding: 20px;
+    }
+
+    .game-card {
+        background: white;
+        width: 100%;
+        max-width: 600px;
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        padding: 40px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* --- STREAK COUNTER --- */
+    .streak-badge {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: #fff7ed;
+        color: #c2410c;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        border: 1px solid #ffedd5;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* --- WORD DISPLAY --- */
+    .word-display {
+        margin-bottom: 40px;
+    }
+
+    .main-word {
+        font-size: 3rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 10px;
+    }
+
+    .word-meta {
+        color: #64748b;
+        font-size: 1.1rem;
+        font-family: monospace;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    /* --- AUDIO BUTTON --- */
+    .audio-btn {
+        background: #f1f5f9;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        cursor: pointer;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+    .audio-btn:hover { background: #e2e8f0; color: #0ea5e9; }
+
+    /* --- OPTIONS GRID --- */
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .option-btn {
+        background: white;
+        border: 2px solid #e2e8f0;
+        padding: 15px;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        color: #334155;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-weight: 500;
+    }
+
+    .option-btn:hover:not(:disabled) {
+        border-color: #cbd5e1;
+        background-color: #f8fafc;
+        transform: translateY(-2px);
+    }
+
+    /* --- FEEDBACK STATES --- */
+    .option-btn.correct {
+        background-color: #dcfce7 !important;
+        border-color: #22c55e !important;
+        color: #15803d !important;
+    }
+
+    .option-btn.wrong {
+        background-color: #fee2e2 !important;
+        border-color: #ef4444 !important;
+        color: #b91c1c !important;
+    }
+
+    .option-btn:disabled {
+        cursor: default;
+        opacity: 0.7;
+        transform: none !important;
+    }
+
+    /* --- LOADING STATE --- */
+    .loader {
+        font-size: 1.2rem;
+        color: #94a3b8;
+        display: none;
+    }
+
+    @media (max-width: 600px) {
+        .options-grid { grid-template-columns: 1fr; }
+        .main-word { font-size: 2.5rem; }
+    }
+</style>
+
+<div class="game-wrapper">
+    <div class="game-card">
+        <div class="streak-badge">
+            🔥 <span id="streak-count">0</span>
+        </div>
+
+        <div id="loader" class="loader">Loading next word...</div>
+
+        <div id="game-content">
+            <div class="word-display">
+                <h1 id="target-word" class="main-word">...</h1>
+                <div class="word-meta">
+                    <span id="target-transcription">/.../</span>
+                    <button class="audio-btn" onclick="speakWord()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z"></path><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="options-container" class="options-grid">
+                </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentTargetId = null;
+    let currentWordText = "";
+    let streak = 0;
+    let isProcessing = false; // Щоб не можна було клікнути двічі
+
+    document.addEventListener("DOMContentLoaded", () => {
+        loadNewQuestion();
+    });
+
+    // 1. ЗАВАНТАЖЕННЯ ПИТАННЯ
+    function loadNewQuestion() {
+        const container = document.getElementById('options-container');
+        const loader = document.getElementById('loader');
+        const content = document.getElementById('game-content');
+
+        // UI: Show loader
+        content.style.opacity = "0.5";
+        isProcessing = false;
+
+        fetch('/api/get_question/')
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'error') {
+                    alert("Додайте мінімум 4 слова в словник!");
+                    window.location.href = "{% url 'dictionary' %}";
+                    return;
+                }
+                renderQuestion(data);
+                content.style.opacity = "1";
+            })
+            .catch(err => console.error(err));
+    }
+
+    // 2. ВІДОБРАЖЕННЯ (RENDER)
+    function renderQuestion(data) {
+        // Оновлюємо слово
+        document.getElementById('target-word').innerText = data.target.word;
+        document.getElementById('target-transcription').innerText = data.target.transcription || "";
+
+        currentTargetId = data.target.id;
+        currentWordText = data.target.word;
+
+        // Очищаємо кнопки
+        const container = document.getElementById('options-container');
+        container.innerHTML = "";
+
+        // Створюємо нові кнопки
+        data.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt.translation;
+            btn.onclick = () => checkAnswer(btn, opt.id);
+            container.appendChild(btn);
+        });
+
+        // Автоматично вимовляємо слово (опціонально, можна закоментувати)
+        // speakWord();
+    }
+
+    // 3. ПЕРЕВІРКА ВІДПОВІДІ
+    function checkAnswer(btn, selectedId) {
+        if (isProcessing) return;
+        isProcessing = true;
+
+        const buttons = document.querySelectorAll('.option-btn');
+
+        if (selectedId == currentTargetId) {
+            // ✅ ПРАВИЛЬНО
+            btn.classList.add('correct');
+            streak++;
+            updateStreakUI();
+
+            // Звук успіху (опціонально)
+            // playSound('ding');
+
+            setTimeout(loadNewQuestion, 1000); // Чекаємо 1с і вантажимо нове
+        } else {
+            // ❌ НЕПРАВИЛЬНО
+            btn.classList.add('wrong');
+            streak = 0;
+            updateStreakUI();
+
+            // Підсвічуємо, яка була правильною
+            buttons.forEach(b => {
+                // Тут трохи складніше, бо ми не зберігаємо ID в DOM кнопки,
+                // але можемо знайти правильну методом виключення або передавати ID в data-attr.
+                // Для простоти, в renderQuestion можна додати data-id.
+            });
+
+            // Знайдемо правильну кнопку, щоб показати юзеру
+            // Перезавантажимо гру трохи пізніше, щоб юзер усвідомив помилку
+            setTimeout(loadNewQuestion, 1500);
+        }
+
+        // Блокуємо всі кнопки
+        buttons.forEach(b => b.disabled = true);
+    }
+
+    // 4. ОЗВУЧКА (Text-to-Speech)
+    function speakWord() {
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(currentWordText);
+            utterance.lang = 'en-US'; // Англійська вимова
+            utterance.rate = 0.9; // Трохи повільніше
+            window.speechSynthesis.speak(utterance);
+        } else {
+            alert("Ваш браузер не підтримує озвучку.");
+        }
+    }
+
+    // 5. STREAK UI
+    function updateStreakUI() {
+        const el = document.getElementById('streak-count');
+        el.innerText = streak;
+
+        // Анімація збільшення
+        el.style.transform = "scale(1.5)";
+        setTimeout(() => el.style.transform = "scale(1)", 200);
+    }
+</script>
+{% endblock %}

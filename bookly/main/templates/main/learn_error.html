@@ -1,0 +1,8 @@
+{% extends 'main/layout.html' %}
+{% block main_content %}
+<div class="dashboard-container" style="text-align: center; padding-top: 100px;">
+    <h1>🎮 Мало слів для гри</h1>
+    <p>{{ message }}</p>
+    <a href="{% url 'dictionary' %}" style="display: inline-block; margin-top: 20px; background: #0EA5E9; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none;">Перейти до словника</a>
+</div>
+{% endblock %}

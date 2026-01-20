@@ -3,57 +3,124 @@
 
 {% block content %}
 <div class="layout-container">
-    
+
     <aside class="sidebar">
         <div>
-            <a href="{% url 'dashboard' %}" class="logo">
+            <a href="{% url 'dashboard' %}" class="logo" style="margin-bottom: 20px;">
                 <svg class="icon" viewBox="0 0 24 24"><path fill="currentColor" d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"></path></svg>
                 <span class="gradient-text">Bookly</span>
             </a>
 
+            {% if not user.profile.is_premium %}
+            <a href="{% url 'premium_page' %}" style="
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                /* Синій градієнт сайту */
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                color: white;
+                padding: 12px 0;
+                border-radius: 50px; /* Овальна форма */
+                text-decoration: none;
+                font-weight: 700;
+                font-size: 1rem;
+                margin-bottom: 30px; /* Відступ до 'Головна' */
+                box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3); /* Красива синя тінь */
+                transition: transform 0.2s, box-shadow 0.2s;
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 15px 25px rgba(59, 130, 246, 0.4)';"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 10px 20px rgba(59, 130, 246, 0.3)';">
+                <span>👑</span> Преміум | 2.00$
+            </a>
+            {% endif %}
+
             <nav class="sidebar-nav">
-                <a href="{% url 'dashboard' %}" 
+                <a href="{% url 'dashboard' %}"
                    class="sidebar-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                    <span>🏠</span> Головна
                 </a>
-                
-                <a href="#" class="sidebar-link"> <span>📚</span> Мої Книги
+
+                <a href="{% url 'bookmarks' %}"
+                   class="sidebar-link {% if request.resolver_match.url_name == 'bookmarks' %}active{% endif %}">
+                   <span>🔖</span> Закладки
                 </a>
-                
+
                 <a href="#" class="sidebar-link"> <span>❤️</span> Улюблене
                 </a>
-                
-                <a href="{% url 'catalog' %}" 
+
+                <a href="{% url 'catalog' %}"
                    class="sidebar-link {% if request.resolver_match.url_name == 'catalog' %}active{% endif %}">
                    <span>🧭</span> Каталог
                 </a>
 
                 {% if user.is_author %}
-                <a href="#" class="sidebar-link"> <span>✍️</span> Кабінет Автора
+                <a href="{% url 'author_dashboard' %}" class="sidebar-link"> <span>✍️</span> Кабінет Автора
                 </a>
                 {% endif %}
             </nav>
+
+            <div class="nav-section-title">ENGLISH LEARNING</div>
+
+            <nav class="sidebar-nav">
+                <a href="{% url 'english_catalog' %}"
+                   class="sidebar-link {% if request.resolver_match.url_name == 'english_catalog' %}active{% endif %}">
+                    <span>🇬🇧</span> Books
+                </a>
+                <a href="{% url 'dictionary' %}"
+                   class="sidebar-link {% if request.resolver_match.url_name == 'dictionary' %}active{% endif %}">
+                    <span>📖</span> Словник
+                </a>
+                <a href="{% url 'learn_words' %}"
+                   class="sidebar-link {% if request.resolver_match.url_name == 'learn_words' %}active{% endif %}">
+                    <span>🎮</span> Вчити слова
+                </a>
+            </nav>
         </div>
-        
+
         <div class="sidebar-profile">
             <img src="{% static 'main/imgs/avatar_placeholder.png' %}" alt="Avatar" class="avatar-small">
             <div class="user-info">
-                <span class="user-name">{{ user.first_name|default:user.email }}</span>
+                <a href="{% url 'profile' %}" class="user-name">
+                    {{ user.first_name|default:user.username }}
+                </a>
                 <a href="{% url 'logout' %}" class="logout-link">Вийти</a>
             </div>
         </div>
     </aside>
 
     <div class="main-content">
-        
+
         <header class="header">
-            <form action="{% url 'catalog' %}" method="GET" class="search-form">
-                <input type="text" name="search" class="search-input" placeholder="Пошук книг, авторів...">
-                <button type="submit" class="search-btn">🔍</button>
+            <form action="{% url 'catalog' %}" method="GET" class="search-bar-group">
+
+                <div class="left-controls">
+
+                    <button type="submit" class="search-btn-icon" title="Шукати">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </button>
+
+                    <div class="select-wrapper">
+                        <select name="search_type" class="search-select">
+                            <option value="all" {% if search_type == 'all' %}selected{% endif %}>Усе</option>
+                            <option value="title" {% if search_type == 'title' %}selected{% endif %}>Назва</option>
+                            <option value="author" {% if search_type == 'author' %}selected{% endif %}>Автор</option>
+                            <option value="text" {% if search_type == 'text' %}selected{% endif %}>Текст</option>
+                        </select>
+                        <svg class="select-arrow" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1L5 5L9 1"/></svg>
+                    </div>
+                </div>
+
+                <input type="text" name="search" placeholder="Пошук книг, авторів..." value="{{ search_query|default:'' }}" class="search-input">
+
             </form>
-            
+
             <div class="header-actions">
-                <a href="#" class="header-icon">🔔</a> <a href="#" class="header-profile"> <img src="{% static 'main/imgs/avatar_placeholder.png' %}" alt="Avatar" class="avatar-medium">
+                <a href="#" class="header-icon">🔔</a>
+                <a href="{% url 'profile' %}" class="header-profile">
+                    <img src="{% static 'main/imgs/avatar_placeholder.png' %}" alt="Avatar" class="avatar-medium">
                 </a>
             </div>
         </header>

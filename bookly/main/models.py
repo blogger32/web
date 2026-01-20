@@ -2,7 +2,36 @@ import uuid
 from django.db import models
 # Імпортуємо вбудовану модель User
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import User
+from django.utils import timezone
+from django.conf import settings
 
+
+class UserProfile(models.Model):
+    # 3. ВИПРАВЛЕННЯ: замість User пишемо settings.AUTH_USER_MODEL
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
+
+    is_premium = models.BooleanField(default=False)
+    premium_end_date = models.DateTimeField(null=True, blank=True)
+    stripe_subscription_id = models.CharField(max_length=255, blank=True, null=True)
+
+    def __str__(self):
+        # Якщо user - це об'єкт, username доступний. Якщо рядок - ні.
+        # Краще використовувати просто ID або обережно форматувати
+        return f"Profile for user {self.user_id}"
+
+
+# Лічильник денного використання
+class DailyUsage(models.Model):
+    # 4. ВИПРАВЛЕННЯ: так само тут
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+
+    date = models.DateField(default=timezone.now)
+    translations_count = models.IntegerField(default=0)
+    words_added_count = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ('user', 'date')
 
 # Розширюємо стандартну модель User
 class User(AbstractUser):
@@ -21,6 +50,17 @@ class User(AbstractUser):
     def __str__(self):
         return self.email
 
+class UserWord(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    word = models.CharField(max_length=100)
+    translation = models.CharField(max_length=255)
+    transcription = models.CharField(max_length=100, blank=True, null=True)
+    part_of_speech = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.word} - {self.translation}"
+
 
 class Book(models.Model):
     """
@@ -37,11 +77,31 @@ class Book(models.Model):
     genre = models.CharField(max_length=100, db_index=True)  # db_index для швидкого пошуку/фільтрації
     cover_url = models.URLField(max_length=500)
 
+    LANGUAGE_CHOICES = [
+        ('uk', 'Українська'),
+        ('en', 'English'),
+    ]
+    language = models.CharField(
+        max_length=2,
+        choices=LANGUAGE_CHOICES,
+        default='uk',  # За замовчуванням всі старі книги стануть українськими
+        verbose_name="Мова"
+    )
+
     # Ми не зберігаємо pdf_path в базі, краще використовувати FileField,
     # але для простоти перенесення вашої логіки, залишимо URL або шлях
     pdf_path = models.CharField(max_length=1000)
 
-    text_content = models.TextField(blank=True, null=True, help_text="Текст книги для режиму читання")
+    text_file_path = models.CharField(
+        max_length=1000,
+        blank=True,
+        null=True,
+        help_text="Шлях до файлу, наприклад: /static/main/books_text/book.txt"
+    )
+
+    # Поле text_content можна залишити як резерв, або видалити пізніше.
+    text_content = models.TextField(blank=True, null=True)
+
     total_pages = models.IntegerField()
     daily_price = models.DecimalField(max_digits=6, decimal_places=2)
     monthly_price = models.DecimalField(max_digits=8, decimal_places=2)
@@ -123,3 +183,6 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f"{self.user.email} likes {self.book.title}"
+
+# ... (ваші попередні імпорти)
+

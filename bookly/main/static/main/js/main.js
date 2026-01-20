@@ -134,3 +134,24 @@ function initPDFReader() {
         }).catch(err => console.error('Error saving progress:', err));
     }
 }
+
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("Bookly JS loaded");
+
+    // Ми ПРИБРАЛИ слухач події 'wheel'.
+    // Тепер тачпад буде працювати так, як задумано Apple/Microsoft:
+    // Свайп вбік -> книги. Свайп вниз -> сторінка.
+});
+
+// --- Функція для кнопок (стрілочок) ---
+function scrollShelf(btn, amount) {
+    // Знаходимо контейнер з книгами поруч із натиснутою кнопкою
+    const container = btn.parentElement.querySelector('.shelf-scroll-container');
+
+    if (container) {
+        container.scrollBy({
+            left: amount,
+            behavior: 'smooth'
+        });
+    }
+}

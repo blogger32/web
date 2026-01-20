@@ -319,5 +319,69 @@
       "rentals_count": 0,
       "created_at": "2023-02-01T00:00:00Z"
     }
-  }
+  },
+
+    {
+      "model": "main.book",
+      "pk": "a1b2c3d4-e5f6-4a5b-8c9d-111111111111",
+      "fields": {
+        "title": "The Sign Of Four",
+        "author": 1,
+        "author_name": "Conan Doyle",
+        "description": "A young lady named Mary Morstan came to consult Holmes...",
+        "daily_price": "12.00",
+        "monthly_price": "24.00",
+        "total_pages": 120,
+        "cover_url": "/static/main/imgs/The_Sign_Of_Four-Conan_Doyle.jpg",
+        "pdf_path": "",
+        "text_file_path": "/static/main/books_text/sherlok_sign_of_four.txt",
+        "genre": "Detective",
+        "language": "en",
+        "created_at": "2023-10-30T10:00:00Z",
+        "rating": 4.5,
+        "rentals_count": 0
+      }
+    },
+    {
+      "model": "main.book",
+      "pk": "b2c3d4e5-f6a7-4b8c-9d10-222222222222",
+      "fields": {
+        "title": "Batman Begins",
+        "author": 1,
+        "author_name": "Goyer David",
+        "description": "This is a fantastic story of the most popular superhero Batman...",
+        "daily_price": "14.00",
+        "monthly_price": "28.00",
+        "total_pages": 140,
+        "cover_url": "/static/main/imgs/Batman_Begins-Goyer_David.jpg",
+        "pdf_path": "",
+        "text_file_path": "/static/main/books_text/batman_begins.txt",
+        "genre": "Fantasy",
+        "language": "en",
+        "created_at": "2023-11-05T12:00:00Z",
+        "rating": 4.6,
+        "rentals_count": 0
+      }
+    },
+    {
+      "model": "main.book",
+      "pk": "c3d4e5f6-a7b8-4c9d-10e1-333333333333",
+      "fields": {
+        "title": "Forrest Gump",
+        "author": 1,
+        "author_name": "John Escott",
+        "description": "Forrest Gump is a kind-hearted man from Alabama...",
+        "daily_price": "13.00",
+        "monthly_price": "26.00",
+        "total_pages": 160,
+        "cover_url": "/static/main/imgs/Forrest_Gump-John_Escott.jpg",
+        "pdf_path": "",
+        "text_file_path": "/static/main/books_text/forrest_gump.txt",
+        "genre": "Drama",
+        "language": "en",
+        "created_at": "2023-11-06T15:30:00Z",
+        "rating": 4.8,
+        "rentals_count": 0
+      }
+    }
 ]
